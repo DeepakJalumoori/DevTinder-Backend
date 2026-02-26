@@ -46,9 +46,17 @@ requestRouter.post("/request/send/:status/:toUserId",
         status
       });
       const data = await connectionRequest.save();
-      const emailResult = await sendEmail.run("A new friend request from " + req.user.firstName + " to " + toUser.firstName,
-       req.user.firstName + " is " + status + " in " + toUser.firstName 
-      );
+      let emailResult = null;
+      try {
+        emailResult = await sendEmail.run(
+          "A new friend request from " + req.user.firstName + " to " + toUser.firstName,
+          req.user.firstName + " is " + status + " in " + toUser.firstName
+        );
+      } catch (emailErr) {
+        console.error("Email failed:", emailErr.message);
+      }
+
+      
       console.log("emailResult",emailResult);
       res.json({
         message : req.user.firstName + " is " + status + " in " + toUser.firstName,
