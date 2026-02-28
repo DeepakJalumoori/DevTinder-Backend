@@ -8,6 +8,10 @@ const requestRouter = require("./routes/request");
 const profileRouter = require("./routes/profile");
 const userRouter = require("./routes/user");
 const cors = require("cors");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
+
 
 require('dotenv').config();
 
@@ -28,12 +32,15 @@ app.use("/",authRouter);
 app.use("/",requestRouter);
 app.use("/",profileRouter);
 app.use("/",userRouter);
+app.use("/", chatRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
 
 
 connectDB().then(() => {
   console.log("Database connection established...");
-  app.listen(process.env.PORT, () => {
+  server.listen(process.env.PORT, () => {
   console.log("Server is running on port " + process.env.PORT + "!!!");
   });
 })
