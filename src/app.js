@@ -13,9 +13,13 @@ const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
 
 require("dotenv").config();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://dev-tinder-ui-seven.vercel.app",
+];
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
