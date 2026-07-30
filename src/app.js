@@ -12,42 +12,51 @@ const http = require("http");
 const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
 
+require("dotenv").config();
 
-require('dotenv').config();
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", corsOptions.origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+  );
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"]
-  })
-);
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 app.use(express.json());
 app.use(cookieParser());
 
-
-app.use("/",authRouter);
-app.use("/",requestRouter);
-app.use("/",profileRouter);
-app.use("/",userRouter);
+app.use("/", authRouter);
+app.use("/", requestRouter);
+app.use("/", profileRouter);
+app.use("/", userRouter);
 app.use("/", chatRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
 
-
-connectDB().then(() => {
-  console.log("Database connection established...");
-  server.listen(process.env.PORT, () => {
-  console.log("Server is running on port " + process.env.PORT + "!!!");
+connectDB()
+  .then(() => {
+    console.log("Database connection established...");
+    server.listen(process.env.PORT, () => {
+      console.log("Server is running on port " + process.env.PORT + "!!!");
+    });
+  })
+  .catch((err) => {
+    console.log("Something went wrong!!!!");
+    console.error(err);
   });
-})
-.catch((err) => {
-  console.log("Something went wrong!!!!");
-  console.error(err);
-});
-
-
-
